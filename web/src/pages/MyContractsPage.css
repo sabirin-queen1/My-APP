@@ -1,0 +1,47 @@
+.my-contracts-page { padding: 32px 0 60px; }
+
+.contracts-tabs {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.contract-tab {
+  padding: 9px 18px; border-radius: 20px; font-size: 14px; font-weight: 600;
+  background: var(--bg-card); color: var(--text-medium);
+  border: 1.5px solid var(--border); cursor: pointer;
+  transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+}
+.contract-tab:hover { border-color: var(--primary); color: var(--primary); }
+.contract-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+.tab-count {
+  background: rgba(255,255,255,0.25); color: inherit;
+  font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 10px;
+}
+.contract-tab:not(.active) .tab-count { background: var(--bg); color: var(--primary); }
+
+.contracts-full-list { display: flex; flex-direction: column; gap: 12px; }
+
+.contract-full-card {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; text-decoration: none; color: inherit;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1.5px solid transparent;
+}
+.contract-full-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--primary-light); }
+
+.cfc-left { display: flex; align-items: center; gap: 16px; flex: 1; }
+.cfc-avatar {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--primary-light); color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 20px; flex-shrink: 0;
+}
+.cfc-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.cfc-job { font-size: 13px; color: var(--text-medium); margin-bottom: 6px; }
+.cfc-meta { font-size: 12px; color: var(--text-light); }
+
+.cfc-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.cfc-salary { font-size: 20px; font-weight: 800; color: var(--primary); }
+.cfc-salary span { font-size: 13px; font-weight: 400; color: var(--text-light); }
+.days-left { font-size: 12px; color: var(--success); font-weight: 600; }
+.sign-needed { font-size: 12px; color: var(--warning); font-weight: 600; background: #fef3c7; padding: 3px 8px; border-radius: 8px; }

@@ -1,0 +1,33 @@
+.reviews-page { padding: 32px 0 60px; }
+
+.reviews-summary {
+  display: flex; gap: 40px; align-items: center;
+  margin-bottom: 24px; padding: 32px;
+}
+.summary-score { text-align: center; flex-shrink: 0; }
+.big-rating { font-size: 56px; font-weight: 800; color: var(--primary); line-height: 1; margin-bottom: 8px; }
+.star-display { display: flex; align-items: center; gap: 4px; justify-content: center; }
+.rating-num { font-size: 14px; font-weight: 600; color: var(--text-medium); margin-left: 4px; }
+.reviews-total { font-size: 13px; color: var(--text-light); margin-top: 8px; }
+
+.rating-dist { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.dist-row { display: flex; align-items: center; gap: 10px; }
+.dist-star { font-size: 13px; color: #f59e0b; font-weight: 600; width: 28px; text-align: right; flex-shrink: 0; }
+.dist-bar { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.dist-fill { height: 100%; background: #f59e0b; border-radius: 4px; transition: width 0.5s ease; }
+.dist-count { font-size: 12px; color: var(--text-light); width: 20px; flex-shrink: 0; }
+
+.reviews-list-full { display: flex; flex-direction: column; gap: 14px; }
+
+.review-full-card { padding: 20px 24px; }
+.rfc-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+.rfc-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--primary-light); color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 17px; flex-shrink: 0;
+}
+.rfc-info { flex: 1; }
+.rfc-info h4 { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+.rfc-date { font-size: 12px; color: var(--text-light); }
+.rfc-comment { font-size: 14px; color: var(--text-medium); line-height: 1.7; font-style: italic; padding-left: 58px; }

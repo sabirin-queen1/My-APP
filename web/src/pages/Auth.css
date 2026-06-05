@@ -1,0 +1,158 @@
+.auth-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+.auth-left {
+  background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  color: white;
+  text-align: center;
+}
+
+.auth-brand-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+}
+
+.auth-brand h2 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+.auth-brand p { font-size: 16px; opacity: 0.8; }
+
+.auth-features {
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-feature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  background: rgba(255,255,255,0.15);
+  padding: 12px 20px;
+  border-radius: 12px;
+}
+
+.auth-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: var(--bg-card);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+}
+
+.auth-card h1 { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+.auth-subtitle { color: var(--text-light); margin-bottom: 28px; }
+
+.role-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  background: var(--bg);
+  padding: 4px;
+  border-radius: 12px;
+}
+
+.role-tab {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-medium);
+  background: transparent;
+  transition: all 0.2s;
+}
+.role-tab.active { background: var(--bg-card); color: var(--primary); box-shadow: var(--shadow); }
+.role-tab:hover:not(.active) { background: var(--bg-card); }
+
+.auth-error {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.auth-forgot { text-align: right; margin-top: -8px; margin-bottom: 16px; }
+.auth-forgot a { font-size: 13px; color: var(--primary); font-weight: 500; }
+
+.auth-submit { width: 100%; padding: 14px; font-size: 16px; margin-bottom: 20px; }
+
+.auth-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.auth-switch { text-align: center; font-size: 14px; color: var(--text-medium); }
+.auth-switch a { color: var(--primary); font-weight: 600; }
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--text-light);
+  font-size: 13px;
+}
+.auth-divider::before, .auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.social-btn {
+  width: 100%;
+  padding: 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+.social-btn:hover { background: var(--bg); border-color: var(--primary); }
+
+.register-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.skill-chip {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-medium);
+}
+.skill-chip.selected { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+
+@media (max-width: 768px) {
+  .auth-page { grid-template-columns: 1fr; }
+  .auth-left { display: none; }
+  .auth-right { padding: 24px; }
+}
