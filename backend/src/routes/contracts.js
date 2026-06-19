@@ -16,8 +16,10 @@ router.post('/', protect, async (req, res) => {
       return res.status(400).json({ message: 'This worker already has an active contract and is not available for hire.' });
     }
 
+    const commissionAmount = Math.round(Number(salary) * 0.30 * 100) / 100;
     const contract = await Contract.create({
       household: req.user._id, worker, jobType, duties, salary, startDate, endDate, contractPeriod,
+      commissionAmount,
       termsAndConditions: [
         'The worker agrees to perform the duties with honesty and dedication.',
         'The family agrees to provide salary on time and respect the rights of the worker.',
@@ -75,6 +77,11 @@ router.put('/:id/sign', protect, async (req, res) => {
   try {
     const contract = await Contract.findById(req.params.id);
     if (!contract) return res.status(404).json({ message: 'Contract not found' });
+
+    // Both parties must pay the 30% commission before signing is allowed
+    if (!contract.familyPaid || !contract.workerPaid) {
+      return res.status(400).json({ message: 'Both family and worker must pay the 30% commission before signing the contract.' });
+    }
 
     const { signature } = req.body;
     if (req.userType === 'household') {

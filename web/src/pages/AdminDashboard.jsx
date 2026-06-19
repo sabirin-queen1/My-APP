@@ -9,6 +9,7 @@ const TABS = [
   { key: 'households', label: '🏠 Households' },
   { key: 'contracts', label: '📋 Contracts' },
   { key: 'reviews', label: '⭐ Reviews' },
+  { key: 'payments', label: '💰 Payments' },
   { key: 'chats', label: '💬 Chats' },
   { key: 'verifications', label: '✅ Verifications' },
 ];
@@ -57,7 +58,8 @@ function StatusBadge({ status }) {
 export default function AdminDashboard() {
   const [tab, setTab] = useState('overview');
   const [stats, setStats] = useState(null);
-  const [data, setData] = useState({ users: [], workers: [], households: [], contracts: [], reviews: [], verifications: [], chats: [] });
+  const [data, setData] = useState({ users: [], workers: [], households: [], contracts: [], reviews: [], verifications: [], chats: [], payments: [] });
+  const [payTotals, setPayTotals] = useState({ totalCommission: 0, totalDeposits: 0 });
   const [loading, setLoading] = useState(true);
   const [confirm, setConfirm] = useState(null); // { message, onConfirm }
   const [search, setSearch] = useState('');
@@ -68,7 +70,7 @@ export default function AdminDashboard() {
   const loadAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [s, users, workers, households, contracts, reviews, verifications, chats] = await Promise.all([
+      const [s, users, workers, households, contracts, reviews, verifications, chats, payments] = await Promise.all([
         adminAPI.getDashboard(),
         adminAPI.getAllUsers(),
         adminAPI.getWorkers(),
@@ -77,8 +79,10 @@ export default function AdminDashboard() {
         adminAPI.getAllReviews(),
         adminAPI.getVerifications(),
         adminAPI.getAllChats(),
+        adminAPI.getAllPayments(),
       ]);
       setStats(s.data);
+      setPayTotals({ totalCommission: payments.data.totalCommission, totalDeposits: payments.data.totalDeposits });
       setData({
         users: users.data,
         workers: workers.data.workers,
@@ -87,6 +91,7 @@ export default function AdminDashboard() {
         reviews: reviews.data,
         verifications: verifications.data,
         chats: chats.data,
+        payments: payments.data.payments,
       });
     } catch (err) { console.error(err); }
     setLoading(false);
@@ -378,6 +383,44 @@ export default function AdminDashboard() {
               </tbody>
             </table>
             {data.reviews.length === 0 && <div className="tbl-empty">No reviews yet</div>}
+          </div>
+        )}
+
+        {/* ── PAYMENTS ── */}
+        {tab === 'payments' && (
+          <div className="card tbl-card">
+            <div className="tbl-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3>💰 Payments &amp; Commissions ({data.payments.length})</h3>
+              <div className="pay-totals">
+                <span className="pay-total commission">Commission earned: <strong>${payTotals.totalCommission?.toFixed(2)}</strong></span>
+                <span className="pay-total deposit">Total deposits: <strong>${payTotals.totalDeposits?.toFixed(2)}</strong></span>
+              </div>
+            </div>
+            {data.payments.length === 0 ? (
+              <div className="tbl-empty">No payments yet</div>
+            ) : (
+              <table className="admin-table">
+                <thead><tr><th>User</th><th>Role</th><th>Type</th><th>Amount</th><th>Balance After</th><th>Date</th></tr></thead>
+                <tbody>
+                  {data.payments.map(p => (
+                    <tr key={p._id}>
+                      <td><div className="tbl-user"><Avatar name={p.userName} /><span>{p.userName}</span></div></td>
+                      <td><span className={`type-chip ${p.userRole === 'worker' ? 'worker' : 'household'}`}>{p.userRole}</span></td>
+                      <td>
+                        <span className={`badge ${p.type === 'commission' ? 'badge-warning' : 'badge-success'}`}>
+                          {p.type === 'commission' ? '30% Commission' : 'Deposit'}
+                        </span>
+                      </td>
+                      <td className={p.type === 'commission' ? 'amount-out' : 'amount-in'}>
+                        {p.type === 'commission' ? '−' : '+'}${p.amount}
+                      </td>
+                      <td className="tbl-light">${p.balanceAfter}</td>
+                      <td className="tbl-light">{new Date(p.createdAt).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
 

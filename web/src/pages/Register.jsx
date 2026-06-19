@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { authAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { SOMALI_REGIONS, REGION_NAMES } from '../data/somaliRegions';
+import { SKILL_TASKS } from '../data/skillTasks';
 import './Auth.css';
 
 const SKILLS = ['Cleaning', 'Cooking', 'Child Care', 'Laundry', 'Ironing', 'Elder Care', 'Gardening', 'Security'];
@@ -25,15 +26,22 @@ export default function Register() {
   const [district, setDistrict] = useState('');
   const [form, setForm] = useState({
     name: '', password: '', phone: '',
-    skills: [], jobTypes: [], experience: 0, bio: '', nationality: 'Somalia', languages: ['Somali'],
+    skills: [], jobTypes: [], specialties: [], experience: 0, bio: '', nationality: 'Somalia', languages: ['Somali'],
     salaryMin: 150, salaryMax: 300, idNumber: '',
     guarantor: { name: '', idName: '', idNumber: '', phone: '', relationship: '', idImage: '' },
   });
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const toggleSkill = (s) => setForm(f => ({ ...f, skills: f.skills.includes(s) ? f.skills.filter(x => x !== s) : [...f.skills, s] }));
+  const toggleSkill = (s) => setForm(f => {
+    const has = f.skills.includes(s);
+    const skills = has ? f.skills.filter(x => x !== s) : [...f.skills, s];
+    // if a skill is removed, also drop its sub-task specialties
+    const specialties = has ? f.specialties.filter(sp => !(SKILL_TASKS[s] || []).includes(sp)) : f.specialties;
+    return { ...f, skills, specialties };
+  });
   const toggleJob = (j) => setForm(f => ({ ...f, jobTypes: f.jobTypes.includes(j) ? f.jobTypes.filter(x => x !== j) : [...f.jobTypes, j] }));
+  const toggleSpecialty = (sp) => setForm(f => ({ ...f, specialties: f.specialties.includes(sp) ? f.specialties.filter(x => x !== sp) : [...f.specialties, sp] }));
   const setGuarantor = (key, val) => setForm(f => ({ ...f, guarantor: { ...f.guarantor, [key]: val } }));
 
   const handleIdImage = (e) => {
@@ -74,7 +82,7 @@ export default function Register() {
       };
       if (type === 'worker') {
         Object.assign(payload, {
-          skills: form.skills, jobTypes: form.jobTypes, experience: form.experience,
+          skills: form.skills, jobTypes: form.jobTypes, specialties: form.specialties, experience: form.experience,
           bio: form.bio, nationality: form.nationality, languages: form.languages,
           idNumber: form.idNumber,
           salary: { min: Number(form.salaryMin), max: Number(form.salaryMax), currency: 'USD' },
@@ -187,6 +195,20 @@ export default function Register() {
                     ))}
                   </div>
                 </div>
+
+                {/* Sub-tasks (specialties) per selected skill */}
+                {form.skills.map(skill => (
+                  <div className="form-group specialty-group" key={skill}>
+                    <label>{skill} — select specific tasks</label>
+                    <div className="register-skills">
+                      {(SKILL_TASKS[skill] || []).map(task => (
+                        <button type="button" key={task}
+                          className={`skill-chip small ${form.specialties.includes(task) ? 'selected' : ''}`}
+                          onClick={() => toggleSpecialty(task)}>{task}</button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
                 <div className="form-group">
                   <label>Job Types</label>
                   <div className="register-skills">

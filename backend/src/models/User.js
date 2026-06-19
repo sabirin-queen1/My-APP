@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
   location: { type: String, default: 'Mogadishu, Somalia' },
   isVerified: { type: Boolean, default: false },
   isActive: { type: Boolean, default: true },
+  walletBalance: { type: Number, default: 0 },
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

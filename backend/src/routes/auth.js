@@ -23,7 +23,7 @@ router.post('/register/household', async (req, res) => {
 // Register Worker
 router.post('/register/worker', async (req, res) => {
   try {
-    const { name, email, password, phone, skills, jobTypes, experience, salary, nationality, languages, bio, idNumber, guarantor } = req.body;
+    const { name, email, password, phone, skills, jobTypes, specialties, experience, salary, nationality, languages, bio, idNumber, guarantor } = req.body;
 
     // Email must be unique across workers
     const existing = await Worker.findOne({ email });
@@ -41,7 +41,7 @@ router.post('/register/worker', async (req, res) => {
     }
 
     const worker = await Worker.create({
-      name, email, password, phone, skills, jobTypes, experience, salary,
+      name, email, password, phone, skills, jobTypes, specialties, experience, salary,
       nationality, languages, bio, idNumber, guarantor
     });
     const token = generateToken(worker._id, 'worker');

@@ -22,6 +22,11 @@ const contractSchema = new mongoose.Schema({
   workerSignature: { type: String, default: '' },
   familySigned: { type: Boolean, default: false },
   workerSigned: { type: Boolean, default: false },
+  // 30% commission both parties must pay before signing opens
+  commissionRate: { type: Number, default: 0.30 },
+  commissionAmount: { type: Number, default: 0 }, // 30% of salary
+  familyPaid: { type: Boolean, default: false },
+  workerPaid: { type: Boolean, default: false },
   confirmedAt: { type: Date },
   notes: { type: String, default: '' },
 }, { timestamps: true });

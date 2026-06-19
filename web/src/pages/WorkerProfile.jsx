@@ -33,9 +33,17 @@ export default function WorkerProfile() {
     setShowHire(true);
   };
 
+  const todayStr = new Date().toISOString().split('T')[0];
+
   const handleHire = async () => {
     if (!hireForm.jobType || !hireForm.salary || !hireForm.startDate || !hireForm.endDate) {
       alert('Please fill all fields'); return;
+    }
+    if (hireForm.startDate < todayStr) {
+      alert('Start date cannot be in the past. Please pick today or a future date.'); return;
+    }
+    if (hireForm.endDate < hireForm.startDate) {
+      alert('End date must be after the start date.'); return;
     }
     setHiring(true);
     try {
@@ -178,11 +186,11 @@ export default function WorkerProfile() {
               </div>
               <div className="form-group">
                 <label>Start Date</label>
-                <input type="date" value={hireForm.startDate} onChange={e => setHireForm({...hireForm, startDate: e.target.value})} />
+                <input type="date" min={todayStr} value={hireForm.startDate} onChange={e => setHireForm({...hireForm, startDate: e.target.value})} />
               </div>
               <div className="form-group">
                 <label>End Date</label>
-                <input type="date" value={hireForm.endDate} onChange={e => setHireForm({...hireForm, endDate: e.target.value})} />
+                <input type="date" min={hireForm.startDate || todayStr} value={hireForm.endDate} onChange={e => setHireForm({...hireForm, endDate: e.target.value})} />
               </div>
               <div className="modal-actions">
                 <button className="btn btn-outline" onClick={() => setShowHire(false)}>Cancel</button>

@@ -65,6 +65,12 @@ export default function WorkerMyProfile() {
             <span className="mp-label">Job Types</span>
             <div className="mp-chips">{worker.jobTypes?.map(j => <span key={j} className="mp-chip">{j}</span>)}</div>
           </div>
+          {worker.specialties?.length > 0 && (
+            <div className="mp-row">
+              <span className="mp-label">Specialties / Tasks</span>
+              <div className="mp-chips">{worker.specialties.map(s => <span key={s} className="mp-chip">{s}</span>)}</div>
+            </div>
+          )}
           {worker.bio && (
             <div className="mp-row">
               <span className="mp-label">About</span>

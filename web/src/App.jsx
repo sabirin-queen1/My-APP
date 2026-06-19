@@ -18,6 +18,7 @@ import MyContractsPage from './pages/MyContractsPage';
 import MyReviewsPage from './pages/MyReviewsPage';
 import WorkerMyProfile from './pages/WorkerMyProfile';
 import HouseholdProfile from './pages/HouseholdProfile';
+import WalletPage from './pages/WalletPage';
 import ChatPage from './pages/ChatPage';
 import Navbar from './components/Navbar';
 
@@ -52,6 +53,7 @@ const AppRoutes = () => {
         <Route path="/my-reviews" element={<PrivateRoute allowedRoles={['worker']}><MyReviewsPage /></PrivateRoute>} />
         <Route path="/my-profile" element={<PrivateRoute allowedRoles={['worker']}><WorkerMyProfile /></PrivateRoute>} />
         <Route path="/family-profile" element={<PrivateRoute allowedRoles={['household']}><HouseholdProfile /></PrivateRoute>} />
+        <Route path="/wallet" element={<PrivateRoute allowedRoles={['household','worker']}><WalletPage /></PrivateRoute>} />
         <Route path="/chat" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
         <Route path="/chat/:otherId" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
         <Route path="/admin" element={<PrivateRoute allowedRoles={['admin']}><AdminDashboard /></PrivateRoute>} />

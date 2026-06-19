@@ -150,6 +150,12 @@
   color: var(--text-medium);
 }
 .skill-chip.selected { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+.skill-chip.small { font-size: 12px; padding: 5px 10px; }
+.specialty-group {
+  background: var(--bg); border-radius: var(--radius);
+  padding: 12px 14px; margin-top: -6px;
+}
+.specialty-group > label { color: var(--primary); font-weight: 600; }
 
 /* ── Username + @gmail.com suffix ── */
 .email-input-wrap {

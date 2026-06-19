@@ -67,6 +67,21 @@ router.get('/contracts', protect, adminOnly, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
+// Get all payments + commission summary (admin oversight)
+router.get('/payments', protect, adminOnly, async (req, res) => {
+  try {
+    const Payment = require('../models/Payment');
+    const payments = await Payment.find().sort({ createdAt: -1 }).limit(200);
+    const totalCommission = payments
+      .filter(p => p.type === 'commission')
+      .reduce((sum, p) => sum + p.amount, 0);
+    const totalDeposits = payments
+      .filter(p => p.type === 'deposit')
+      .reduce((sum, p) => sum + p.amount, 0);
+    res.json({ payments, totalCommission, totalDeposits });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
 // Get all chat conversations (admin oversight)
 router.get('/chats', protect, adminOnly, async (req, res) => {
   try {

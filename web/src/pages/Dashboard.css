@@ -9,6 +9,14 @@
 .dashboard-header h1 { font-size: 26px; font-weight: 700; }
 .dashboard-header p { color: var(--text-medium); margin-top: 4px; }
 
+.household-greeting-link {
+  text-decoration: none; color: inherit;
+  padding: 8px 12px; margin: -8px -12px; border-radius: var(--radius);
+  transition: background 0.2s;
+}
+.household-greeting-link:hover { background: var(--bg-card); }
+.household-greeting-link p { color: var(--primary) !important; font-weight: 500; }
+
 .notif-btn {
   position: relative;
   font-size: 24px;

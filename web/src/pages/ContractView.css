@@ -37,4 +37,26 @@
 .sig-check { font-size: 20px; }
 .sig-placeholder { font-size: 13px; color: var(--text-light); font-style: italic; }
 
+/* Commission payment section */
+.commission-section {
+  background: #fef3c7; border: 1.5px solid #f59e0b;
+  border-radius: var(--radius); padding: 18px 20px; margin-bottom: 28px;
+}
+.commission-section h3 { font-size: 15px; font-weight: 700; color: #92400e; margin-bottom: 8px; }
+.commission-note { font-size: 13px; color: #92400e; line-height: 1.6; margin-bottom: 14px; }
+.commission-note a { color: var(--primary); font-weight: 600; }
+.commission-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.commission-box {
+  background: white; border: 1.5px solid var(--border); border-radius: var(--radius);
+  padding: 12px 14px; display: flex; flex-direction: column; gap: 4px;
+}
+.commission-box.paid { border-color: var(--success); background: #f0fdf4; }
+.cm-label { font-size: 12px; color: var(--text-light); }
+.cm-status { font-size: 14px; font-weight: 700; color: var(--text-dark); }
+.commission-pay { width: 100%; }
+.commission-done {
+  margin-top: 12px; padding: 10px 14px; background: #dcfce7; color: #16a34a;
+  border-radius: 10px; font-size: 13px; font-weight: 600; text-align: center;
+}
+
 .contract-actions { display: flex; gap: 12px; padding-top: 20px; border-top: 1px solid var(--border); }

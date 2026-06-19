@@ -59,6 +59,12 @@ export const notificationsAPI = {
   markAllRead: () => API.put('/notifications/read-all'),
 };
 
+export const paymentsAPI = {
+  getWallet: () => API.get('/payments/wallet'),
+  deposit: (amount) => API.post('/payments/deposit', { amount }),
+  payCommission: (contractId) => API.post(`/payments/commission/${contractId}`),
+};
+
 export const chatAPI = {
   getConversations: () => API.get('/chat'),
   getMessages: (otherId) => API.get(`/chat/${otherId}`),
@@ -76,6 +82,7 @@ export const adminAPI = {
   getAllReviews: () => API.get('/admin/reviews'),
   getAllChats: () => API.get('/admin/chats'),
   getChatMessages: (chatId) => API.get(`/admin/chats/${chatId}`),
+  getAllPayments: () => API.get('/admin/payments'),
   deleteHousehold: (id) => API.delete(`/admin/households/${id}`),
   deleteWorker: (id) => API.delete(`/admin/workers/${id}`),
   deleteContract: (id) => API.delete(`/admin/contracts/${id}`),

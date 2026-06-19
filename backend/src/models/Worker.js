@@ -18,6 +18,8 @@ const workerSchema = new mongoose.Schema({
     type: String,
     enum: ['House Cleaning', 'Cooking', 'Babysitter', 'Nanny', 'Driver', 'Gardener', 'Security Guard', 'Elder Care']
   }],
+  specialties: [{ type: String }], // specific sub-tasks per skill (e.g. "Window Cleaning")
+  walletBalance: { type: Number, default: 0 },
   experience: { type: Number, default: 0 },
   salary: {
     min: { type: Number, default: 150 },

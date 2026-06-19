@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { contractsAPI } from '../services/api';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { contractsAPI, paymentsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './ContractView.css';
 
@@ -11,10 +11,22 @@ export default function ContractView() {
   const [contract, setContract] = useState(null);
   const [loading, setLoading] = useState(true);
   const [signing, setSigning] = useState(false);
+  const [paying, setPaying] = useState(false);
 
   useEffect(() => {
     contractsAPI.getById(id).then(r => setContract(r.data)).finally(() => setLoading(false));
   }, [id]);
+
+  const handlePayCommission = async () => {
+    setPaying(true);
+    try {
+      await paymentsAPI.payCommission(id);
+      const res = await contractsAPI.getById(id);
+      setContract(res.data);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Payment failed');
+    } finally { setPaying(false); }
+  };
 
   const handleSign = async () => {
     setSigning(true);
@@ -23,7 +35,7 @@ export default function ContractView() {
       const res = await contractsAPI.sign(id, { signature });
       setContract(res.data);
     } catch (err) {
-      alert('Failed to sign contract');
+      alert(err.response?.data?.message || 'Failed to sign contract');
     } finally { setSigning(false); }
   };
 
@@ -79,6 +91,36 @@ export default function ContractView() {
               </ol>
             </div>
 
+            {/* Commission payment — required before signing */}
+            {contract.status === 'pending' && (
+              <div className="commission-section">
+                <h3>💰 Commission Payment (30%)</h3>
+                <p className="commission-note">
+                  Both family and worker must each pay a 30% commission of ${contract.salary}
+                  {' '}(= <strong>${contract.commissionAmount || Math.round(contract.salary * 0.3)}</strong>) before the contract can be signed.
+                  Pay from your <Link to="/wallet">Wallet</Link>.
+                </p>
+                <div className="commission-grid">
+                  <div className={`commission-box ${contract.familyPaid ? 'paid' : ''}`}>
+                    <span className="cm-label">Family (30%)</span>
+                    <span className="cm-status">{contract.familyPaid ? '✅ Paid' : '⏳ Not paid'}</span>
+                  </div>
+                  <div className={`commission-box ${contract.workerPaid ? 'paid' : ''}`}>
+                    <span className="cm-label">Worker (30%)</span>
+                    <span className="cm-status">{contract.workerPaid ? '✅ Paid' : '⏳ Not paid'}</span>
+                  </div>
+                </div>
+                {((role === 'household' && !contract.familyPaid) || (role === 'worker' && !contract.workerPaid)) && (
+                  <button className="btn btn-primary commission-pay" onClick={handlePayCommission} disabled={paying}>
+                    {paying ? 'Processing...' : `💳 Pay My 30% ($${contract.commissionAmount || Math.round(contract.salary * 0.3)})`}
+                  </button>
+                )}
+                {contract.familyPaid && contract.workerPaid && (
+                  <div className="commission-done">✅ Both parties paid — you can now sign the contract below.</div>
+                )}
+              </div>
+            )}
+
             <div className="signatures-section">
               <h3>Signatures</h3>
               <div className="signatures-grid">
@@ -104,9 +146,15 @@ export default function ContractView() {
 
           <div className="contract-actions">
             {canSign && contract.status === 'pending' && (
-              <button className="btn btn-primary" onClick={handleSign} disabled={signing}>
-                {signing ? 'Signing...' : '✍️ Sign Contract'}
-              </button>
+              contract.familyPaid && contract.workerPaid ? (
+                <button className="btn btn-primary" onClick={handleSign} disabled={signing}>
+                  {signing ? 'Signing...' : '✍️ Sign Contract'}
+                </button>
+              ) : (
+                <button className="btn btn-primary" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+                  🔒 Sign (after both pay 30%)
+                </button>
+              )
             )}
             {contract.status === 'active' && role === 'household' && (
               <button className="btn btn-outline" onClick={() => navigate(`/reviews/${contract.worker?._id}`)}>

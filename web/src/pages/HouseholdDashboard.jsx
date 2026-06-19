@@ -35,10 +35,10 @@ export default function HouseholdDashboard() {
 
         {/* Header */}
         <div className="dashboard-header">
-          <div>
+          <Link to="/family-profile" className="household-greeting-link" title="View my profile">
             <h1>Hello, {user?.name?.split(' ')[0]} Family 👋</h1>
-            <p>What would you like to do today?</p>
-          </div>
+            <p>Tap here to view your profile →</p>
+          </Link>
           <Link to="/notifications" className="notif-btn" title="Notifications">
             🔔
             {unread > 0 && <span className="notif-badge">{unread}</span>}
