@@ -1,0 +1,64 @@
+.my-profile-page { padding: 32px 0 60px; }
+
+.mp-header { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
+.mp-avatar {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-light), #ddd6fe);
+  color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 28px; flex-shrink: 0;
+}
+.mp-head-info h1 { font-size: 22px; font-weight: 700; }
+.mp-email { font-size: 13px; color: var(--text-light); margin: 2px 0 8px; }
+.mp-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.mp-section { margin-bottom: 20px; }
+.mp-section h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+
+.mp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; margin-bottom: 8px; }
+.mp-detail { display: flex; flex-direction: column; gap: 3px; }
+.mp-detail-label { font-size: 12px; color: var(--text-light); }
+.mp-detail-value { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+
+.mp-row { display: flex; flex-direction: column; gap: 6px; padding-top: 14px; margin-top: 6px; border-top: 1px solid var(--border); }
+.mp-label { font-size: 12px; color: var(--text-light); }
+.mp-value { font-size: 14px; color: var(--text-medium); line-height: 1.6; }
+.mp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.mp-chip { font-size: 12px; background: var(--primary-light); color: var(--primary); padding: 3px 10px; border-radius: 12px; font-weight: 500; }
+
+.mp-empty { font-size: 14px; color: var(--text-light); }
+
+.mp-id-block { padding-top: 16px; margin-top: 8px; border-top: 1px solid var(--border); }
+.mp-id-toggle {
+  display: block; margin-top: 8px;
+  font-size: 13px; font-weight: 600; color: var(--primary);
+  background: var(--primary-light); border-radius: 10px; padding: 8px 16px;
+}
+.mp-id-img { margin-top: 12px; }
+.mp-id-img img {
+  width: 100%; max-width: 480px; max-height: 320px; object-fit: contain;
+  border: 1.5px solid var(--border); border-radius: var(--radius); background: var(--bg-card);
+}
+
+.back-btn { background: none; font-size: 14px; font-weight: 600; color: var(--primary); padding: 8px 0; margin-bottom: 16px; display: block; }
+
+/* Household contract documents */
+.hp-contracts { display: flex; flex-direction: column; gap: 12px; }
+.hp-contract-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px; border: 1.5px solid var(--border); border-radius: var(--radius);
+  text-decoration: none; color: inherit; transition: all 0.2s;
+}
+.hp-contract-row:hover { border-color: var(--primary); background: var(--bg); }
+.hp-c-left { display: flex; align-items: center; gap: 14px; }
+.hp-c-icon { font-size: 28px; }
+.hp-c-left h4 { font-size: 15px; font-weight: 700; }
+.hp-c-left p { font-size: 13px; color: var(--text-medium); }
+.hp-c-dates { font-size: 11px !important; color: var(--text-light) !important; }
+.hp-c-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.hp-view { font-size: 12px; color: var(--primary); font-weight: 600; opacity: 0; transition: opacity 0.2s; }
+.hp-contract-row:hover .hp-view { opacity: 1; }
+
+@media (max-width: 768px) {
+  .mp-grid { grid-template-columns: 1fr; }
+}

@@ -17,11 +17,13 @@ export default function Navbar() {
   const householdLinks = [
     { to: '/dashboard', label: 'Home' },
     { to: '/search', label: 'Search Worker' },
+    { to: '/family-profile', label: 'My Profile' },
     { to: '/chat', label: 'Messages' },
     { to: '/notifications', label: 'Notifications' },
   ];
   const workerLinks = [
     { to: '/worker-dashboard', label: 'Dashboard' },
+    { to: '/my-profile', label: 'My Profile' },
     { to: '/chat', label: 'Messages' },
     { to: '/notifications', label: 'Notifications' },
   ];

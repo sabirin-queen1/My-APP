@@ -14,7 +14,7 @@ export default function WorkerProfile() {
   const [loading, setLoading] = useState(true);
   const [hiring, setHiring] = useState(false);
   const [hireForm, setHireForm] = useState({
-    jobType: '', salary: '', startDate: '', endDate: '', contractPeriod: '1 Year'
+    jobType: '', duties: '', salary: '', startDate: '', endDate: '', contractPeriod: '1 Year'
   });
 
   useEffect(() => {
@@ -22,6 +22,16 @@ export default function WorkerProfile() {
       .then(([w, r]) => { setWorker(w.data); setReviews(r.data); })
       .finally(() => setLoading(false));
   }, [id]);
+
+  const openHire = () => {
+    // pre-fill salary with the worker's expected minimum (household can still change it)
+    setHireForm(f => ({
+      ...f,
+      jobType: worker?.jobTypes?.[0] || '',
+      salary: worker?.salary?.min || '',
+    }));
+    setShowHire(true);
+  };
 
   const handleHire = async () => {
     if (!hireForm.jobType || !hireForm.salary || !hireForm.startDate || !hireForm.endDate) {
@@ -94,9 +104,29 @@ export default function WorkerProfile() {
               )}
             </div>
 
+            {worker.activeContract && (
+              <div className="contract-banner">
+                <span className="cb-icon">🔒</span>
+                <div>
+                  <strong>Currently under contract</strong>
+                  <p>
+                    This worker is {worker.activeContract.status === 'pending' ? 'reserved (pending contract)' : 'employed'} until{' '}
+                    {new Date(worker.activeContract.endDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    {' '}(year {new Date(worker.activeContract.endDate).getFullYear()}). Not available for hire.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {role === 'household' && (
               <div className="profile-actions">
-                <button className="btn btn-primary" onClick={() => setShowHire(true)}>Hire Now</button>
+                {worker.activeContract ? (
+                  <button className="btn btn-primary" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+                    Unavailable — Under Contract
+                  </button>
+                ) : (
+                  <button className="btn btn-primary" onClick={openHire}>Hire Now</button>
+                )}
                 <Link to={`/chat/${id}`} className="btn btn-outline">💬 Chat</Link>
               </div>
             )}
@@ -138,8 +168,13 @@ export default function WorkerProfile() {
                 </select>
               </div>
               <div className="form-group">
+                <label>📝 Job Duties / Work Description</label>
+                <textarea rows={3} placeholder="Describe the work to be done (e.g. cleaning 3 rooms, cooking lunch & dinner, caring for 2 children...)" value={hireForm.duties} onChange={e => setHireForm({...hireForm, duties: e.target.value})} />
+              </div>
+              <div className="form-group">
                 <label>Monthly Salary (USD)</label>
                 <input type="number" placeholder="e.g. 250" value={hireForm.salary} onChange={e => setHireForm({...hireForm, salary: e.target.value})} />
+                <span className="email-preview">Worker's expected range: <strong>${worker.salary?.min} – ${worker.salary?.max}</strong></span>
               </div>
               <div className="form-group">
                 <label>Start Date</label>

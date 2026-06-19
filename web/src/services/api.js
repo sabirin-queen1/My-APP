@@ -23,9 +23,11 @@ API.interceptors.response.use(
 );
 
 export const authAPI = {
-  loginHousehold: (data) => API.post('/auth/login', { ...data, role: 'household' }),
-  loginWorker: (data) => API.post('/auth/login', { ...data, role: 'worker' }),
-  loginAdmin: (data) => API.post('/auth/login', { ...data, role: 'admin' }),
+  login: (data) => API.post('/auth/login', data),
+  // kept for backwards-compat (role is ignored by the backend now)
+  loginHousehold: (data) => API.post('/auth/login', data),
+  loginWorker: (data) => API.post('/auth/login', data),
+  loginAdmin: (data) => API.post('/auth/login', data),
   registerHousehold: (data) => API.post('/auth/register/household', data),
   registerWorker: (data) => API.post('/auth/register/worker', data),
   getMe: () => API.get('/auth/me'),
@@ -72,6 +74,8 @@ export const adminAPI = {
   getAllUsers: () => API.get('/admin/users'),
   getAllContracts: () => API.get('/admin/contracts'),
   getAllReviews: () => API.get('/admin/reviews'),
+  getAllChats: () => API.get('/admin/chats'),
+  getChatMessages: (chatId) => API.get(`/admin/chats/${chatId}`),
   deleteHousehold: (id) => API.delete(`/admin/households/${id}`),
   deleteWorker: (id) => API.delete(`/admin/workers/${id}`),
   deleteContract: (id) => API.delete(`/admin/contracts/${id}`),

@@ -4,6 +4,13 @@ import { authAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './Auth.css';
 
+// if username already contains @, keep it; otherwise append @gmail.com
+const buildEmail = (username) => {
+  const u = username.trim();
+  if (!u) return '';
+  return u.includes('@') ? u.toLowerCase() : `${u.toLowerCase()}@gmail.com`;
+};
+
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '', role: 'household' });
   const [loading, setLoading] = useState(false);
@@ -16,11 +23,9 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      let res;
-      if (form.role === 'worker') res = await authAPI.loginWorker({ email: form.email, password: form.password });
-      else if (form.role === 'admin') res = await authAPI.loginAdmin({ email: form.email, password: form.password });
-      else res = await authAPI.loginHousehold({ email: form.email, password: form.password });
-
+      const email = buildEmail(form.email);
+      // backend auto-detects the role (household / worker / admin) from the account
+      const res = await authAPI.login({ email, password: form.password });
       login(res.data.token, res.data.user, res.data.user.role);
       navigate('/');
     } catch (err) {
@@ -41,7 +46,7 @@ export default function Login() {
         <div className="auth-features">
           <div className="auth-feature"><span>✅</span> Verified Workers</div>
           <div className="auth-feature"><span>📋</span> Digital Contracts</div>
-          <div className="auth-feature"><span>⭐</span> Ratings & Reviews</div>
+          <div className="auth-feature"><span>⭐</span> Ratings &amp; Reviews</div>
         </div>
       </div>
 
@@ -50,32 +55,24 @@ export default function Login() {
           <h1>Welcome Back</h1>
           <p className="auth-subtitle">Login to your account</p>
 
-          <div className="role-tabs">
-            {['household', 'worker', 'admin'].map(r => (
-              <button
-                key={r}
-                className={`role-tab ${form.role === r ? 'active' : ''}`}
-                onClick={() => setForm({ ...form, role: r })}
-              >
-                {r === 'household' ? '👨‍👩‍👧 Family' : r === 'worker' ? '👷 Worker' : '⚙️ Admin'}
-              </button>
-            ))}
-          </div>
-
           {error && <div className="auth-error">{error}</div>}
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Email Address</label>
+              <label>Username or Email</label>
               <input
-                type="email" placeholder="your@email.com" required
+                type="text"
+                required
                 value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
               />
+              {form.email && !form.email.includes('@') && (
+                <span className="email-preview">Login as: <strong>{buildEmail(form.email)}</strong></span>
+              )}
             </div>
             <div className="form-group">
               <label>Password</label>
               <input
-                type="password" placeholder="••••••••" required
+                type="password" required
                 value={form.password} onChange={e => setForm({ ...form, password: e.target.value })}
               />
             </div>

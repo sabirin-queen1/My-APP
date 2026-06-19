@@ -2,34 +2,88 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { authAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { SOMALI_REGIONS, REGION_NAMES } from '../data/somaliRegions';
 import './Auth.css';
 
 const SKILLS = ['Cleaning', 'Cooking', 'Child Care', 'Laundry', 'Ironing', 'Elder Care', 'Gardening', 'Security'];
 const JOB_TYPES = ['House Cleaning', 'Cooking', 'Babysitter', 'Nanny', 'Driver', 'Gardener', 'Security Guard', 'Elder Care'];
+
+// build a full email from a username; if it already has @, keep it, otherwise append @gmail.com
+const buildEmail = (username) => {
+  const u = username.trim();
+  if (!u) return '';
+  return u.includes('@') ? u.toLowerCase() : `${u.toLowerCase()}@gmail.com`;
+};
 
 export default function Register() {
   const [params] = useSearchParams();
   const [type, setType] = useState(params.get('type') === 'worker' ? 'worker' : 'household');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [username, setUsername] = useState('');
+  const [region, setRegion] = useState('');
+  const [district, setDistrict] = useState('');
   const [form, setForm] = useState({
-    name: '', email: '', password: '', phone: '', location: 'Mogadishu, Somalia',
-    skills: [], jobTypes: [], experience: 0, bio: '', nationality: 'Somalia', languages: ['Somali']
+    name: '', password: '', phone: '',
+    skills: [], jobTypes: [], experience: 0, bio: '', nationality: 'Somalia', languages: ['Somali'],
+    salaryMin: 150, salaryMax: 300, idNumber: '',
+    guarantor: { name: '', idName: '', idNumber: '', phone: '', relationship: '', idImage: '' },
   });
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const toggleSkill = (s) => setForm(f => ({ ...f, skills: f.skills.includes(s) ? f.skills.filter(x => x !== s) : [...f.skills, s] }));
   const toggleJob = (j) => setForm(f => ({ ...f, jobTypes: f.jobTypes.includes(j) ? f.jobTypes.filter(x => x !== j) : [...f.jobTypes, j] }));
+  const setGuarantor = (key, val) => setForm(f => ({ ...f, guarantor: { ...f.guarantor, [key]: val } }));
+
+  const handleIdImage = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { setError('ID image must be under 5 MB.'); return; }
+    const reader = new FileReader();
+    reader.onloadend = () => setGuarantor('idImage', reader.result); // base64 data URL
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    const email = buildEmail(username);
+    if (!email) { setError('Please enter a username.'); return; }
+    if (!region || !district) { setError('Please select your region and district.'); return; }
+    const location = `${district}, ${region}, Somalia`;
+
+    if (type === 'worker') {
+      const g = form.guarantor;
+      if (!g.name.trim() || !g.idName.trim() || !g.idNumber.trim()) {
+        setError('Guarantor name, ID name, and ID number are required.'); return;
+      }
+      if (!g.idImage) {
+        setError("Please upload a photo of the guarantor's ID."); return;
+      }
+      if (g.name.trim().toLowerCase().replace(/\s+/g, ' ') !== g.idName.trim().toLowerCase().replace(/\s+/g, ' ')) {
+        setError('Guarantor name does not match the name on the ID.'); return;
+      }
+    }
+
     setLoading(true);
     try {
+      const payload = {
+        name: form.name, email, password: form.password, phone: form.phone, location,
+      };
+      if (type === 'worker') {
+        Object.assign(payload, {
+          skills: form.skills, jobTypes: form.jobTypes, experience: form.experience,
+          bio: form.bio, nationality: form.nationality, languages: form.languages,
+          idNumber: form.idNumber,
+          salary: { min: Number(form.salaryMin), max: Number(form.salaryMax), currency: 'USD' },
+          guarantor: form.guarantor,
+        });
+      }
       const res = type === 'worker'
-        ? await authAPI.registerWorker(form)
-        : await authAPI.registerHousehold(form);
+        ? await authAPI.registerWorker(payload)
+        : await authAPI.registerHousehold(payload);
       login(res.data.token, res.data.user, res.data.user.role);
       navigate('/');
     } catch (err) {
@@ -48,7 +102,7 @@ export default function Register() {
           <p>Join Somalia's trusted platform</p>
         </div>
         <div className="auth-features">
-          <div className="auth-feature"><span>🔒</span> Secure & Verified</div>
+          <div className="auth-feature"><span>🔒</span> Secure &amp; Verified</div>
           <div className="auth-feature"><span>📱</span> Available on Mobile</div>
           <div className="auth-feature"><span>💰</span> Fair Pay, Safe Work</div>
         </div>
@@ -69,23 +123,39 @@ export default function Register() {
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Full Name</label>
-              <input type="text" placeholder="Ahmed Mohamed" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+              <input type="text" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
             </div>
+
             <div className="form-group">
-              <label>Email Address</label>
-              <input type="email" placeholder="your@email.com" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+              <label>Username</label>
+              <div className="email-input-wrap">
+                <input type="text" required value={username}
+                  onChange={e => setUsername(e.target.value.replace(/\s/g, ''))} />
+                <span className="email-suffix">@gmail.com</span>
+              </div>
             </div>
+
             <div className="form-group">
               <label>Password</label>
-              <input type="password" placeholder="Min 6 characters" required minLength={6} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
+              <input type="password" required minLength={6} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
             </div>
             <div className="form-group">
               <label>Phone Number</label>
-              <input type="tel" placeholder="+252 61 1234567" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
+              <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
             </div>
             <div className="form-group">
-              <label>Location</label>
-              <input type="text" placeholder="Mogadishu, Somalia" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} />
+              <label>Region (Gobol)</label>
+              <select required value={region} onChange={e => { setRegion(e.target.value); setDistrict(''); }}>
+                <option value="">Select region...</option>
+                {REGION_NAMES.map(r => <option key={r} value={r}>{r}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>District (Degmo)</label>
+              <select required value={district} disabled={!region} onChange={e => setDistrict(e.target.value)}>
+                <option value="">{region ? 'Select district...' : 'Select a region first'}</option>
+                {region && SOMALI_REGIONS[region].map(d => <option key={d} value={d}>{d}</option>)}
+              </select>
             </div>
 
             {type === 'worker' && (
@@ -94,6 +164,21 @@ export default function Register() {
                   <label>Experience (years)</label>
                   <input type="number" min="0" max="50" value={form.experience} onChange={e => setForm({ ...form, experience: Number(e.target.value) })} />
                 </div>
+
+                <div className="form-group">
+                  <label>Expected Salary (USD / month)</label>
+                  <div className="salary-row">
+                    <input type="number" min="0" value={form.salaryMin} onChange={e => setForm({ ...form, salaryMin: e.target.value })} />
+                    <span className="salary-dash">—</span>
+                    <input type="number" min="0" value={form.salaryMax} onChange={e => setForm({ ...form, salaryMax: e.target.value })} />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Your National ID Number</label>
+                  <input type="text" value={form.idNumber} onChange={e => setForm({ ...form, idNumber: e.target.value })} />
+                </div>
+
                 <div className="form-group">
                   <label>Skills</label>
                   <div className="register-skills">
@@ -112,7 +197,49 @@ export default function Register() {
                 </div>
                 <div className="form-group">
                   <label>About You</label>
-                  <textarea rows={3} placeholder="Tell families about your experience..." value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} />
+                  <textarea rows={3} value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} />
+                </div>
+
+                {/* Guarantor (Damiin) section */}
+                <div className="guarantor-section">
+                  <div className="guarantor-title">🛡️ Guarantor (Damiin) — required</div>
+                  <p className="guarantor-note">A worker must provide a guarantor. The guarantor name must match the name on the guarantor's ID.</p>
+
+                  <div className="form-group">
+                    <label>Guarantor Full Name</label>
+                    <input type="text" required value={form.guarantor.name} onChange={e => setGuarantor('name', e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label>Name as written on Guarantor's ID</label>
+                    <input type="text" required value={form.guarantor.idName} onChange={e => setGuarantor('idName', e.target.value)} />
+                    {form.guarantor.name && form.guarantor.idName && (
+                      form.guarantor.name.trim().toLowerCase() === form.guarantor.idName.trim().toLowerCase()
+                        ? <span className="match-ok">✅ Names match</span>
+                        : <span className="match-bad">❌ Names do not match</span>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label>Guarantor ID Number</label>
+                    <input type="text" required value={form.guarantor.idNumber} onChange={e => setGuarantor('idNumber', e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label>Upload Guarantor's ID (photo)</label>
+                    <input type="file" accept="image/*" className="id-file-input" onChange={handleIdImage} />
+                    {form.guarantor.idImage && (
+                      <div className="id-preview">
+                        <img src={form.guarantor.idImage} alt="Guarantor ID" />
+                        <button type="button" className="id-remove" onClick={() => setGuarantor('idImage', '')}>✕ Remove</button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label>Guarantor Phone</label>
+                    <input type="tel" value={form.guarantor.phone} onChange={e => setGuarantor('phone', e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label>Relationship to Worker</label>
+                    <input type="text" value={form.guarantor.relationship} onChange={e => setGuarantor('relationship', e.target.value)} />
+                  </div>
                 </div>
               </>
             )}

@@ -40,10 +40,13 @@ export default function WorkerDashboard() {
 
         {/* Header */}
         <div className="worker-dash-header">
-          <div>
-            <h1>Welcome, {user?.name?.split(' ')[0]} 👋</h1>
-            <p>Manage your jobs and contracts</p>
-          </div>
+          <Link to="/my-profile" className="worker-greeting-link" title="View my full profile">
+            <div className="wd-avatar">{user?.name?.charAt(0)?.toUpperCase()}</div>
+            <div>
+              <h1>Welcome, {user?.name?.split(' ')[0]} 👋</h1>
+              <p>Tap here to view your profile & guarantor →</p>
+            </div>
+          </Link>
           <Link to="/my-reviews" className="worker-rating-badge" title="View my reviews">
             ⭐ {stats?.rating || user?.rating || '0.0'}
             <span className="rating-sub">({stats?.totalReviews || 0} reviews)</span>

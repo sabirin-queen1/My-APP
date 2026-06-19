@@ -36,6 +36,18 @@ const workerSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   bio: { type: String, default: '' },
   idDocument: { type: String, default: '' },
+  // Worker's own national ID
+  idNumber: { type: String, default: '' },
+  // Guarantor (damiin) — required for worker verification
+  guarantor: {
+    name: { type: String, default: '' },         // guarantor's full name
+    idName: { type: String, default: '' },        // name exactly as written on guarantor's ID
+    idNumber: { type: String, default: '' },      // guarantor's national ID number
+    idImage: { type: String, default: '' },       // photo of guarantor's ID (base64 data URL)
+    phone: { type: String, default: '' },
+    relationship: { type: String, default: '' },  // e.g. relative, friend, neighbour
+    address: { type: String, default: '' },
+  },
 }, { timestamps: true });
 
 workerSchema.pre('save', async function (next) {

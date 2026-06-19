@@ -31,11 +31,28 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get single worker
+// Get single worker (includes active-contract info so the profile can show availability)
 router.get('/:id', async (req, res) => {
   try {
-    const worker = await Worker.findById(req.params.id).select('-password');
+    const worker = await Worker.findById(req.params.id).select('-password').lean();
     if (!worker) return res.status(404).json({ message: 'Worker not found' });
+
+    // Check whether this worker currently has an active or pending contract
+    const Contract = require('../models/Contract');
+    const activeContract = await Contract.findOne({
+      worker: req.params.id,
+      status: { $in: ['active', 'pending'] }
+    }).select('status startDate endDate jobType').lean();
+
+    if (activeContract) {
+      worker.activeContract = {
+        status: activeContract.status,
+        startDate: activeContract.startDate,
+        endDate: activeContract.endDate,
+        jobType: activeContract.jobType,
+      };
+    }
+
     res.json(worker);
   } catch (err) {
     res.status(500).json({ message: err.message });

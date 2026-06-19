@@ -5,6 +5,12 @@ import { authAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { COLORS, FONTS, SHADOWS } from '../components/theme';
 
+const buildEmail = (username) => {
+  const u = (username || '').trim();
+  if (!u) return '';
+  return u.includes('@') ? u.toLowerCase() : `${u.toLowerCase()}@gmail.com`;
+};
+
 export default function LoginScreen({ navigation }) {
   const [form, setForm] = useState({ email: '', password: '', role: 'household' });
   const [loading, setLoading] = useState(false);
@@ -14,9 +20,10 @@ export default function LoginScreen({ navigation }) {
     if (!form.email || !form.password) { Alert.alert('Error', 'Please fill all fields'); return; }
     setLoading(true);
     try {
+      const email = buildEmail(form.email);
       let res;
-      if (form.role === 'worker') res = await authAPI.loginWorker({ email: form.email, password: form.password });
-      else res = await authAPI.loginHousehold({ email: form.email, password: form.password });
+      if (form.role === 'worker') res = await authAPI.loginWorker({ email, password: form.password });
+      else res = await authAPI.loginHousehold({ email, password: form.password });
       await login(res.data.token, res.data.user, res.data.user.role);
     } catch (err) {
       Alert.alert('Login Failed', err.response?.data?.message || 'Invalid credentials');
@@ -36,20 +43,10 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.subtitle}>Login to your account</Text>
         </View>
 
-        <View style={styles.roleTabs}>
-          {['household', 'worker'].map(r => (
-            <TouchableOpacity key={r} style={[styles.roleTab, form.role === r && styles.roleTabActive]} onPress={() => setForm({ ...form, role: r })}>
-              <Text style={[styles.roleTabText, form.role === r && styles.roleTabTextActive]}>
-                {r === 'household' ? '👨‍👩‍👧 Family' : '👷 Worker'}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
         <View style={styles.form}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email Address</Text>
-            <TextInput style={styles.input} placeholder="your@email.com" keyboardType="email-address" autoCapitalize="none" value={form.email} onChangeText={t => setForm({ ...form, email: t })} />
+            <Text style={styles.label}>Username or Email</Text>
+            <TextInput style={styles.input} placeholder="ahmett  (or admin@homecare.so)" autoCapitalize="none" value={form.email} onChangeText={t => setForm({ ...form, email: t })} />
           </View>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Password</Text>

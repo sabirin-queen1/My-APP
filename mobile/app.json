@@ -4,7 +4,6 @@
     "slug": "homecare-somalia",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "backgroundColor": "#6C4EF2"
@@ -19,8 +18,8 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.homecare.somalia"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }

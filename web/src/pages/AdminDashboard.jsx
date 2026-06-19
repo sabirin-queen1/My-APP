@@ -9,6 +9,7 @@ const TABS = [
   { key: 'households', label: '🏠 Households' },
   { key: 'contracts', label: '📋 Contracts' },
   { key: 'reviews', label: '⭐ Reviews' },
+  { key: 'chats', label: '💬 Chats' },
   { key: 'verifications', label: '✅ Verifications' },
 ];
 
@@ -56,16 +57,18 @@ function StatusBadge({ status }) {
 export default function AdminDashboard() {
   const [tab, setTab] = useState('overview');
   const [stats, setStats] = useState(null);
-  const [data, setData] = useState({ users: [], workers: [], households: [], contracts: [], reviews: [], verifications: [] });
+  const [data, setData] = useState({ users: [], workers: [], households: [], contracts: [], reviews: [], verifications: [], chats: [] });
   const [loading, setLoading] = useState(true);
   const [confirm, setConfirm] = useState(null); // { message, onConfirm }
   const [search, setSearch] = useState('');
   const [verifyLoading, setVerifyLoading] = useState({});
+  const [openChat, setOpenChat] = useState(null); // { chatId, participants }
+  const [chatMessages, setChatMessages] = useState([]);
 
   const loadAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [s, users, workers, households, contracts, reviews, verifications] = await Promise.all([
+      const [s, users, workers, households, contracts, reviews, verifications, chats] = await Promise.all([
         adminAPI.getDashboard(),
         adminAPI.getAllUsers(),
         adminAPI.getWorkers(),
@@ -73,6 +76,7 @@ export default function AdminDashboard() {
         adminAPI.getAllContracts(),
         adminAPI.getAllReviews(),
         adminAPI.getVerifications(),
+        adminAPI.getAllChats(),
       ]);
       setStats(s.data);
       setData({
@@ -82,10 +86,17 @@ export default function AdminDashboard() {
         contracts: contracts.data,
         reviews: reviews.data,
         verifications: verifications.data,
+        chats: chats.data,
       });
     } catch (err) { console.error(err); }
     setLoading(false);
   }, []);
+
+  const viewChat = async (convo) => {
+    setOpenChat(convo);
+    const res = await adminAPI.getChatMessages(convo.chatId);
+    setChatMessages(res.data);
+  };
 
   useEffect(() => { loadAll(); }, [loadAll]);
 
@@ -367,6 +378,64 @@ export default function AdminDashboard() {
               </tbody>
             </table>
             {data.reviews.length === 0 && <div className="tbl-empty">No reviews yet</div>}
+          </div>
+        )}
+
+        {/* ── CHATS ── */}
+        {tab === 'chats' && (
+          <div className="card tbl-card">
+            <div className="tbl-header"><h3>💬 Conversations ({data.chats.length}) — monitor worker ↔ family chats</h3></div>
+            {data.chats.length === 0 ? (
+              <div className="tbl-empty">No conversations yet</div>
+            ) : (
+              <table className="admin-table">
+                <thead><tr><th>Participants</th><th>Last Message</th><th>Messages</th><th>Last Activity</th><th>Action</th></tr></thead>
+                <tbody>
+                  {data.chats.map(c => (
+                    <tr key={c.chatId}>
+                      <td>
+                        <div className="chat-parties">
+                          {c.participants.map(p => (
+                            <span key={p.id} className="chat-party">
+                              <Avatar name={p.name} size={26} /> {p.name} <span className="chat-role">({p.role})</span>
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="tbl-comment">{c.lastMessage}</td>
+                      <td className="tbl-light" style={{ textAlign: 'center' }}><span className="badge badge-primary">{c.count}</span></td>
+                      <td className="tbl-light">{new Date(c.lastTime).toLocaleString()}</td>
+                      <td><button className="act-btn toggle" onClick={() => viewChat(c)} title="View conversation">👁️</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
+
+        {/* Chat viewer modal */}
+        {openChat && (
+          <div className="modal-overlay" onClick={() => setOpenChat(null)}>
+            <div className="chat-viewer" onClick={e => e.stopPropagation()}>
+              <div className="chat-viewer-header">
+                <h3>💬 {openChat.participants.map(p => p.name).join(' ↔ ')}</h3>
+                <button className="chat-viewer-close" onClick={() => setOpenChat(null)}>✕</button>
+              </div>
+              <div className="chat-viewer-body">
+                {chatMessages.length === 0 ? (
+                  <p className="tbl-empty">No messages</p>
+                ) : chatMessages.map(m => (
+                  <div key={m._id} className="cv-msg">
+                    <div className="cv-msg-head">
+                      <strong>{m.senderName || 'User'}</strong>
+                      <span className="cv-msg-time">{new Date(m.createdAt).toLocaleString()}</span>
+                    </div>
+                    <p className="cv-msg-text">{m.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 

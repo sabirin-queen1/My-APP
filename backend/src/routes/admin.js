@@ -67,6 +67,49 @@ router.get('/contracts', protect, adminOnly, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
+// Get all chat conversations (admin oversight)
+router.get('/chats', protect, adminOnly, async (req, res) => {
+  try {
+    const Message = require('../models/Message');
+    const convos = await Message.aggregate([
+      { $sort: { createdAt: -1 } },
+      { $group: {
+        _id: '$chatId',
+        lastMessage: { $first: '$text' },
+        lastTime: { $first: '$createdAt' },
+        count: { $sum: 1 },
+      }},
+      { $sort: { lastTime: -1 } },
+    ]);
+
+    // Resolve the two participants of each chatId
+    const result = await Promise.all(convos.map(async (c) => {
+      const [id1, id2] = c._id.split('_');
+      const resolveName = async (id) => {
+        const u = await User.findById(id).select('name role').lean();
+        if (u) return { id, name: u.name, role: u.role };
+        const w = await Worker.findById(id).select('name').lean();
+        if (w) return { id, name: w.name, role: 'worker' };
+        return { id, name: 'Unknown', role: 'unknown' };
+      };
+      const p1 = await resolveName(id1);
+      const p2 = await resolveName(id2);
+      return { chatId: c._id, participants: [p1, p2], lastMessage: c.lastMessage, lastTime: c.lastTime, count: c.count };
+    }));
+
+    res.json(result);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+// Get all messages in one conversation (admin oversight)
+router.get('/chats/:chatId', protect, adminOnly, async (req, res) => {
+  try {
+    const Message = require('../models/Message');
+    const messages = await Message.find({ chatId: req.params.chatId }).sort({ createdAt: 1 });
+    res.json(messages);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
 // Get all reviews (admin view)
 router.get('/reviews', protect, adminOnly, async (req, res) => {
   try {

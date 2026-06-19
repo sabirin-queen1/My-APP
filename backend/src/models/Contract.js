@@ -4,6 +4,7 @@ const contractSchema = new mongoose.Schema({
   household: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   worker: { type: mongoose.Schema.Types.ObjectId, ref: 'Worker', required: true },
   jobType: { type: String, required: true },
+  duties: { type: String, default: '' }, // description of the work / job duties
   salary: { type: Number, required: true },
   currency: { type: String, default: 'USD' },
   startDate: { type: Date, required: true },

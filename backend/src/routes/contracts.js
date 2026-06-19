@@ -8,7 +8,7 @@ const { protect } = require('../middleware/auth');
 router.post('/', protect, async (req, res) => {
   try {
     if (req.userType !== 'household') return res.status(403).json({ message: 'Only households can create contracts' });
-    const { worker, jobType, salary, startDate, endDate, contractPeriod } = req.body;
+    const { worker, jobType, duties, salary, startDate, endDate, contractPeriod } = req.body;
 
     // Check: worker already has active or pending contract
     const existingContract = await Contract.findOne({ worker, status: { $in: ['active', 'pending'] } });
@@ -17,7 +17,7 @@ router.post('/', protect, async (req, res) => {
     }
 
     const contract = await Contract.create({
-      household: req.user._id, worker, jobType, salary, startDate, endDate, contractPeriod,
+      household: req.user._id, worker, jobType, duties, salary, startDate, endDate, contractPeriod,
       termsAndConditions: [
         'The worker agrees to perform the duties with honesty and dedication.',
         'The family agrees to provide salary on time and respect the rights of the worker.',

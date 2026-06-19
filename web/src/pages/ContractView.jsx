@@ -63,6 +63,7 @@ export default function ContractView() {
               <tbody>
                 <tr><td>Worker</td><td><strong>{contract.worker?.name}</strong></td></tr>
                 <tr><td>Job Type</td><td>{contract.jobType}</td></tr>
+                {contract.duties && <tr><td>Job Duties</td><td>{contract.duties}</td></tr>}
                 <tr><td>Salary</td><td><strong>${contract.salary} / Month</strong></td></tr>
                 <tr><td>Contract Period</td><td>{contract.contractPeriod || 'Custom'}</td></tr>
                 <tr><td>Start Date</td><td>{new Date(contract.startDate).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' })}</td></tr>
